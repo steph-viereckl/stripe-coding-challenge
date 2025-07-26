@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8"/>
+        <title>Awesome Checkout</title>
+        <meta name="description" content="A demo of a payment on Stripe"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <link rel="stylesheet" href="/static/css/checkout.css"/>
+
+        <!--      Bootstrap -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+              integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+        <script src="https://js.stripe.com/basil/stripe.js"></script>
+        <script src="/static/js/checkout.js" defer></script>
+
+    </head>
+    <body>
+
+    {% include "nav.html" %}
+
+
+        <div class="success-container container">
+
+            <div class="py-3 text-center">
+
+                <h2>Checkout</h2>
+                <p class="lead">You're almost there! Join millions of other users who have used Awesome Company Products and
+                    thrived.</p>
+            </div>
+
+            <!-- Payment Component and Cart Component -->
+            <div class="row">
+
+                <!-- Stripe Payment Form -->
+                <div class="col-md-8">
+                    <div class="d-flex justify-content-center">
+                         <form id="payment-form">
+                        <h4>Contact Information</h4>
+                        <div><label>Email <input type="text" id="email"/></label></div>
+                        <div type="text" id="email-errors"></div>
+
+                        <h4>Billing Address</h4>
+                        <div id="billing-address-element">
+                            <!--Stripe.js injects the Address Element-->
+                        </div>
+                        <h4>Payment</h4>
+                        <div id="payment-element">
+                            <!--Stripe.js injects the Payment Element-->
+                        </div>
+                        <button id="submit">
+                            <div class="spinner hidden" id="spinner"></div>
+                            <span id="button-text">Pay now</span>
+                        </button>
+                        <div id="payment-message" class="hidden"></div>
+                        <div id="error-message" class="hidden text-danger"></div>
+
+                    </form>
+                    </div>
+
+                </div>
+
+                <!-- Your Cart Component-->
+                <div class="col-md-4">
+                    <div class="card p-3">
+                        <h3 class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-primary">Your cart</span>
+                            <span class="badge bg-primary rounded-pill">1</span>
+                        </h3>
+                        <ul class="list-group mb-3">
+                            <li class="list-group-item d-flex justify-content-between lh-sm">
+                                <div>
+                                    <h6 class="my-0">{{option}} Subscription</h6>
+                                    <small class="text-muted">This subscription will automatically renew each month unless you cancel at least 24 hours before your renewal date.</small>
+                                </div>
+                                <span class="text-muted" id="monthly_amount"></span>
+                            </li>
+
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>Total Amount</span>
+                                <strong id="total_amount"></strong>
+                            </li>
+                        </ul>
+                    </div>
+
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <footer class="py-3 my-4 border-top">
+            <p class="text-center text-body-secondary">© 2025 Awesome Company, Inc</p>
+        </footer>
+
+        <!-- Bootstrap javascript file -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+                integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q"
+                crossorigin="anonymous">
+        </script>
+    </body>
+</html>
