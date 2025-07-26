@@ -1,4 +1,4 @@
-# Ravus Coding Challenge Overview
+# Coding Challenge Overview
 This challenge assesses your ability to leverage Stripe and create a functional web application. You will build a simple subscription service
 that allows users to select a plan, enter their information, and complete payment using Stripe. This challenge is meant to provide little
 guardrails and allow you to showcase creative freedom in bringing the solution to life.
