@@ -94,10 +94,7 @@ def create_checkout_session():
     price_id = PRICE_LIST[product_option]
 
     try:
-
-
-        # Add endpoint on server to create Checkout Session
-        # Response includes client_secret (which client uses to complete payment)
+        # Create Checkout Session (New Session everytime customer attempts to pay)
         session = stripe.checkout.Session.create(
             ui_mode = 'custom',
             line_items=[
@@ -107,17 +104,18 @@ def create_checkout_session():
                 },
             ],
             mode='subscription', # One or more recurring prices, use subscription
-            # return_url=LOCAL_DOMAIN + '/complete.html?session_id={CHECKOUT_SESSION_ID}',
+
+            # return_url=LOCAL_DOMAIN + '/complete.html?session_id={CHECKOUT_SESSION_ID}', # Not rendering when using .html ???
             return_url=LOCAL_DOMAIN + '/complete?session_id={CHECKOUT_SESSION_ID}',
         )
 
-        print(f'Session Details: {session}')
+        # print(f'Session Details: {session}')
 
     except Exception as e:
         print('Exception thrown loading Stripe session')
         return str(e)
 
-    # Pass client secret in URL so that when the user clicks "pay now" then can complete transaction
+    # Pass client secret in URL so that when the user clicks "pay now" they can complete transaction
     return jsonify(clientSecret=session.client_secret)
 
 
@@ -132,7 +130,7 @@ def session_status():
     I am not seeing them created with this API.
 
     2. At what point should we reliably create the Subscription in the local db?
-    Other docs look like they use webhooks?
+    Other docs look like they use webhooks just in case the internet/issues prevent user from successfully redirecting
     """
 
     session = stripe.checkout.Session.retrieve(request.args.get('session_id'), expand=["payment_intent"])

@@ -1,4 +1,5 @@
-// This is your test publishable API key.
+// QUESTION: Is this sensitive? What is the web best practice to pass from backend to client side? Pass as Flask variable?
+// Initialize stripe with test publishable key
 const stripe = Stripe("pk_test_51RnNZyFf4W5Y63k1fz4nomxvdKPdjbmJteurjQoFFV3Qb9eWhW7fPgpLEcT6kvlvOBrpTKUGRRkQ2nMYfYPb34ks00jSBuExoU");
 
 let checkout;
@@ -28,7 +29,7 @@ async function initialize() {
     const option = urlParams.get('option')
     const post_body = {'option' : option}
 
-    // Call python endpoint that makes api call to Stripe to get client secret
+    // Call python endpoint that makes api call to Stripe to create Checkout Session and return Client Secret
     const promise = fetch("/create-checkout-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -43,8 +44,9 @@ async function initialize() {
 
     const appearance = {theme: 'stripe',};
 
+    // Initialize Checkout => Returns checkout object (containing data from Checkout Session and methods to update it)
     checkout = await stripe.initCheckout({
-        fetchClientSecret: () => promise,
+        fetchClientSecret: () => promise, // promise contains client secret retrieved in main.py create checkout session
         elementsOptions: { appearance },
     });
 
