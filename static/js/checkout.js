@@ -25,82 +25,80 @@ async function initialize() {
     // Get subscription option in the params
     const queryString = window.location.search;
     const urlParams = new URLSearchParams(queryString)
-
     const option = urlParams.get('option')
     const post_body = {'option' : option}
 
-//  const promise = fetch("/create-checkout-session", {
-//    method: "POST",
-//    headers: { "Content-Type": "application/json" },
-//    body: JSON.stringify(post_body)
-//  })
-//    .then((r) => r.json())
-//    .then((r) => r.clientSecret);
-
-  const promise = fetch("/create-checkout-session", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(post_body)
-  })
+    // Call python endpoint that makes api call to Stripe to get client secret
+    const promise = fetch("/create-checkout-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(post_body)
+    })
     .then((r) => r.json())
     .then((r) => r.clientSecret)
     .catch(error => {
+        // Show error message if there was a problem calling the Stripe API
         showErrorMessage('There was a problem loading the Stripe Payment Page. Please try again later.')
     })
 
-  const appearance = {
-    theme: 'stripe',
-  };
-  checkout = await stripe.initCheckout({
-    fetchClientSecret: () => promise,
-    elementsOptions: { appearance },
-  });
+    const appearance = {theme: 'stripe',};
 
-  checkout.on('change', (session) => {
+    checkout = await stripe.initCheckout({
+        fetchClientSecret: () => promise,
+        elementsOptions: { appearance },
+    });
+
+    checkout.on('change', (session) => {
     // Handle changes to the checkout session
-  });
+    });
 
-  document.querySelector("#button-text").textContent = `Pay ${
-    checkout.session().total.total.amount
-  } now`;
-  emailInput.addEventListener("input", () => {
-    // Clear any validation errors
-    emailErrors.textContent = "";
-    emailInput.classList.remove("error");
-  });
+    // Load the amount the customer should pay
+    document.querySelector("#button-text").textContent = `Pay ${checkout.session().total.total.amount} now`;
 
-  emailInput.addEventListener("blur", async () => {
-    const newEmail = emailInput.value;
-    if (!newEmail) {
-      return;
-    }
+    // Add email validators
+    emailInput.addEventListener("input", () => {
+        // Clear any validation errors
+        emailErrors.textContent = "";
+        emailInput.classList.remove("error");
+    });
 
-    const { isValid, message } = await validateEmail(newEmail);
-    if (!isValid) {
-      emailInput.classList.add("error");
-      emailErrors.textContent = message;
-    }
-  });
+    emailInput.addEventListener("blur", async () => {
+        const newEmail = emailInput.value;
 
-  // Update the Stripe payment form elements html
-  const paymentElement = checkout.createPaymentElement();
-  paymentElement.mount("#payment-element");
-  const billingAddressElement = checkout.createBillingAddressElement();
-  billingAddressElement.mount("#billing-address-element");
+        if (!newEmail) {
+          return;
+        }
 
-  // Update the "Your Cart" elements html
-  const monthlyAmount = document.getElementById("monthly_amount");
-  monthlyAmount.innerHTML = checkout.session().total.total.amount;
-  const totalAmount = document.getElementById("total_amount");
-  totalAmount.innerHTML = checkout.session().total.total.amount;
+        const { isValid, message } = await validateEmail(newEmail);
+
+        if (!isValid) {
+          emailInput.classList.add("error");
+          emailErrors.textContent = message;
+        }
+    });
+
+    // Update the Stripe payment form elements html
+    const paymentElement = checkout.createPaymentElement();
+    paymentElement.mount("#payment-element");
+    const billingAddressElement = checkout.createBillingAddressElement();
+    billingAddressElement.mount("#billing-address-element");
+
+    // Update the "Your Cart" elements html
+    const monthlyAmount = document.getElementById("monthly_amount");
+    monthlyAmount.innerHTML = checkout.session().total.total.amount;
+    const totalAmount = document.getElementById("total_amount");
+    totalAmount.innerHTML = checkout.session().total.total.amount;
 }
 
+// When user clicks "Pay Now"
 async function handleSubmit(e) {
+
   e.preventDefault();
   setLoading(true);
 
   const email = document.getElementById("email").value;
   const { isValid, message } = await validateEmail(email);
+
   if (!isValid) {
     emailInput.classList.add("error");
     emailErrors.textContent = message;

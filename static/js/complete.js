@@ -20,40 +20,39 @@ const InfoIcon =
 
 // ------- UI helpers -------
 function setSessionDetails(session) {
-  let statusText = "Something went wrong, please try again.";
-  let iconColor = "#DF1B41";
-  let icon = ErrorIcon;
+    let statusText = "Something went wrong, please try again.";
+    let iconColor = "#DF1B41";
+    let icon = ErrorIcon;
 
+    if (!session) {
+        console.log("No session found");
+        setErrorState();
+        return;
+    }
 
-  if (!session) {
-    console.log("No session found");
-    setErrorState();
-    return;
-  }
+    switch (session.status) {
+        case "complete":
+          statusText = "Yay! Payment Successful";
+          iconColor = "#30B130";
+          icon = SuccessIcon;
+          break;
+        case "open":
+          statusText = "Payment Failed";
+          iconColor = "#DF1B41";
+          icon = ErrorIcon;
+          break;
+        default:
+          break;
+    }
 
-  switch (session.status) {
-    case "complete":
-      statusText = "Yay! Payment Successful";
-      iconColor = "#30B130";
-      icon = SuccessIcon;
-      break;
-    case "open":
-      statusText = "Payment Failed";
-      iconColor = "#DF1B41";
-      icon = ErrorIcon;
-      break;
-    default:
-      break;
-  }
-
-  document.querySelector("#status-icon").style.backgroundColor = iconColor;
-  document.querySelector("#status-icon").innerHTML = icon;
-  document.querySelector("#status-text").textContent= statusText;
-  document.querySelector("#intent-status").textContent = toTitleCase(session.status);
-//  document.querySelector("#intent-id").textContent = session.payment_intent_id;
-  document.querySelector("#session-status").textContent = toTitleCase(session.payment_status);
-//  document.querySelector("#payment-intent-status").textContent = session.payment_intent_status;
-  document.querySelector("#view-details").href = `https://dashboard.stripe.com/payments/${session.payment_intent_id}`;
+    document.querySelector("#status-icon").style.backgroundColor = iconColor;
+    document.querySelector("#status-icon").innerHTML = icon;
+    document.querySelector("#status-text").textContent= statusText;
+    document.querySelector("#intent-status").textContent = toTitleCase(session.status);
+    //  document.querySelector("#intent-id").textContent = session.payment_intent_id;
+    document.querySelector("#session-status").textContent = toTitleCase(session.payment_status);
+    //  document.querySelector("#payment-intent-status").textContent = session.payment_intent_status;
+    document.querySelector("#view-details").href = `https://dashboard.stripe.com/payments/${session.payment_intent_id}`;
 }
 
 function toTitleCase(str) {
@@ -71,22 +70,25 @@ function setErrorState() {
   document.querySelector("#view-details").classList.add("hidden");
 }
 
+// ------- Run Program -------
+
 initialize();
 
 async function initialize() {
     console.log('in initialize')
-  const queryString = window.location.search;
-  const urlParams = new URLSearchParams(queryString);
-  const sessionId = urlParams.get("session_id");
-  console.log(sessionId)
-  if (!sessionId) {
-    console.log("No session ID found");
-    setErrorState();
-    return;
-  }
-  const response = await fetch(`/session-status?session_id=${sessionId}`);
-  const session = await response.json();
-    console.log('session: ', session)
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    const sessionId = urlParams.get("session_id");
+    console.log(sessionId)
 
-  setSessionDetails(session);
+    if (!sessionId) {
+        console.log("No session ID found");
+        setErrorState();
+        return;
+    }
+
+    const response = await fetch(`/session-status?session_id=${sessionId}`);
+    const session = await response.json();
+//    console.log('session: ', session)
+    setSessionDetails(session);
 }
