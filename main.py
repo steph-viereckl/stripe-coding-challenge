@@ -50,7 +50,8 @@ class Subscription(database.Model):
 with app.app_context():
     database.create_all()
 
-# TODO This should be way more dynamic. Would it be better to make an API call for the
+# TODO This should be way more dynamic. Use product lookup keys to find price id from server?
+# Update the prices shown in index.html to show dynamic pricing
 # most up to date product list? What is the best identifier for each product?
 PRICE_LIST = {
     'Basic': 'price_1RnlfmFf4W5Y63k1EzAu467v',
